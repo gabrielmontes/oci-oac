@@ -115,11 +115,16 @@ func (c *OacClient) RestCall(method, path, bodyFile string) (string, error) {
 
 	var bodyBytes []byte
 	if bodyFile != "" {
-		bodyBytes, err = os.ReadFile(bodyFile)
-		if err != nil {
-			return "", err
+		if _, err := os.Stat(bodyFile); err == nil {
+			bodyBytes, err = os.ReadFile(bodyFile)
+			if err != nil {
+				return "", err
+			}
+		} else {
+			bodyBytes = []byte(bodyFile)
 		}
 	}
+
 
 	instanceUrl := os.Getenv("OAC_INSTANCE")
 	url := strings.TrimRight(instanceUrl, "/") + "/" + strings.TrimLeft(path, "/")
